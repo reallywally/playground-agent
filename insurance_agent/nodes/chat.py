@@ -8,6 +8,14 @@ from langchain_core.runnables import Runnable
 from insurance_agent.state import AgentState
 
 
+def with_system_prompt(messages: list[BaseMessage], system_prompt: str) -> list[BaseMessage]:
+    """Prepend a single system message for the LLM call when state does not already include one."""
+    msgs = list(messages)
+    if not any(isinstance(m, SystemMessage) for m in msgs):
+        return [SystemMessage(content=system_prompt), *msgs]
+    return msgs
+
+
 def make_chat_node(
     llm: Runnable,
     system_prompt: str,
@@ -15,10 +23,7 @@ def make_chat_node(
     """Returns a LangGraph node: append system once, then model reply to latest messages."""
 
     def chat_node(state: AgentState) -> dict[str, list[BaseMessage]]:
-        messages = list(state["messages"])
-        has_system = any(isinstance(m, SystemMessage) for m in messages)
-        if not has_system:
-            messages = [SystemMessage(content=system_prompt), *messages]
+        messages = with_system_prompt(list(state["messages"]), system_prompt)
         response = llm.invoke(messages)
         if isinstance(response, AIMessage):
             return {"messages": [response]}
