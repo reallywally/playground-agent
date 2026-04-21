@@ -25,4 +25,4 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["insurance_agent*"]
+include = ["insurance_agent*", "benchmark_agent*"]
