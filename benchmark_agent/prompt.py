@@ -3,9 +3,16 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from insurance_agent.prompt_loader import load_fenced_system_prompt
-
 from benchmark_agent.config import benchmark_prompt_path
+
+
+def _load_fenced_system_prompt(md_path: Path) -> str:
+    """Extract the first ``` ... ``` block from the markdown file."""
+    text = md_path.read_text(encoding="utf-8")
+    match = re.search(r"```\s*\n(.*?)```", text, re.DOTALL)
+    if not match:
+        raise ValueError(f"No ``` fenced block found in {md_path}")
+    return match.group(1).strip()
 
 _ACTIVE_BLOCK = re.compile(
     r"(ACTIVE_TOOLS \(한 줄에 하나, 하이픈 목록\):\n)(?:- [^\n]*\n)+",
@@ -40,5 +47,5 @@ def load_benchmark_system_prompt(
     active_tool_names: list[str] | None = None,
 ) -> str:
     path = md_path or benchmark_prompt_path()
-    base = load_fenced_system_prompt(path)
+    base = _load_fenced_system_prompt(path)
     return inject_active_tools(base, list(active_tool_names or []))
