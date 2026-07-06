@@ -1,0 +1,10 @@
+{
+  "id": "q-add-01",
+  "user": "7과 15를 더한 값은? 반드시 제공된 덧셈 도구만 사용해 계산해 줘.",
+  "active_tools": ["add_two_integers", "noop_identity", "string_uppercase"],
+  "expected_tool_names": ["add_two_integers"],
+  "match_mode": "strict_order",
+  "allow_extra": false,
+  "expected_args": [{"a": 7, "b": 15}],
+  "args_match": "canonical_json"
+}
